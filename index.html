@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ODOO 20: ERP ODYSSEY — Cyber-Galactic ERP Simulator</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&family=Orbitron:wght@600;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <!-- BACKGROUND STARFIELD CANVAS -->
+  <canvas id="starfield"></canvas>
+
+  <!-- TOP GAME HUD -->
+  <header class="game-hud">
+    <div class="hud-left">
+      <div class="brand-badge">
+        <span class="odoo-logo-glyph">o</span>
+        <div class="brand-titles">
+          <h1>ODOO 20 <span class="accent-cyan">ODYSSEY</span></h1>
+          <span class="subtitle">NEBULA LOGISTICS CORP. // ERP SIMULATOR</span>
+        </div>
+      </div>
+      <div class="player-rank-box">
+        <div class="rank-top">
+          <span id="player-title" class="rank-badge">STAGE 1: stagista Galattico</span>
+          <span id="xp-counter" class="xp-text">0 / 500 XP</span>
+        </div>
+        <div class="xp-bar-outer">
+          <div id="xp-bar-fill" class="xp-bar-fill" style="width: 0%"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="hud-center">
+      <div class="kpi-pill">
+        <span class="kpi-label">CREDITI AZIENDALI</span>
+        <span id="hud-credits" class="kpi-value gold">₡ 12.500</span>
+      </div>
+      <div class="kpi-pill">
+        <span class="kpi-label">EFFICIENZA ERP</span>
+        <span id="hud-efficiency" class="kpi-value cyan">15%</span>
+      </div>
+      <div class="kpi-pill">
+        <span class="kpi-label">CAOS EXCEL</span>
+        <span id="hud-chaos" class="kpi-value danger">85%</span>
+      </div>
+    </div>
+
+    <div class="hud-right">
+      <button id="btn-codex" class="hud-btn" title="Manuale Interattivo Odoo 20">
+        <span>📘</span> Codex Odoo 20
+      </button>
+      <button id="btn-boss-trigger" class="hud-btn boss-btn" title="Sfida finale di certificazione">
+        <span>👾</span> Boss Audit
+      </button>
+      <button id="btn-sound" class="hud-btn icon-only" title="Attiva/Disattiva Effetti Sonori">
+        🔊
+      </button>
+      <button id="btn-reset" class="hud-btn icon-only" title="Ricomincia Partita">
+        ↺
+      </button>
+    </div>
+  </header>
+
+  <!-- MAIN WORKSPACE -->
+  <main class="game-container">
+    <!-- LEFT PANEL: QUESTS & MENTOR O.D.I.N. -->
+    <aside class="quest-sidebar">
+      <!-- MENTOR DIALOG CARD -->
+      <div class="mentor-card">
+        <div class="mentor-header">
+          <div class="mentor-avatar" id="mentor-avatar">
+            <div class="ai-core"></div>
+            <div class="ai-ring"></div>
+          </div>
+          <div class="mentor-meta">
+            <span class="mentor-name">O.D.I.N. v20.4</span>
+            <span class="mentor-role">Co-Pilota AI Odoo 20</span>
+          </div>
+          <span class="live-indicator">ONLINE</span>
+        </div>
+        <div class="mentor-speech" id="mentor-speech">
+          Benvenuto a bordo, Consulente! La <strong>Nebula Logistics</strong> sta collassando sotto 400 fogli Excel sparsi. Segui la missione attiva qui sotto per digitalizzare l'azienda con <strong>Odoo 20</strong>!
+        </div>
+        <div class="mentor-actions">
+          <button id="btn-hint" class="btn-secondary-sm">💡 Dammi un indizio</button>
+          <button id="btn-explain" class="btn-secondary-sm">🎓 Teoria Modulo</button>
+        </div>
+      </div>
+
+      <!-- CAMPAIGN MISSIONS LIST -->
+      <div class="missions-panel">
+        <div class="panel-header">
+          <h2>⚡ MISSIONI OPERATIVE</h2>
+          <span id="mission-progress-text" class="badge-count">0/6</span>
+        </div>
+        <div id="missions-list" class="missions-list">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+
+      <!-- SHORTCUT CHEATSHEET -->
+      <div class="shortcut-card">
+        <div class="shortcut-title">⌨️ Segreti Odoo 20</div>
+        <div class="shortcut-row"><kbd>Alt</kbd> + <kbd>K</kbd> <span>Command Palette Globale</span></div>
+        <div class="shortcut-row"><kbd>AI</kbd> <span>Odoo 20 Smart Auto-Pilot</span></div>
+        <div class="shortcut-row"><kbd>Smart Button</kbd> <span>Navigazione Relazionale</span></div>
+      </div>
+    </aside>
+
+    <!-- RIGHT PANEL: INTERACTIVE ODOO 20 OS SHELL -->
+    <section class="odoo-os-wrapper">
+      <!-- ODOO 20 TOP NAVBAR -->
+      <nav class="odoo-navbar">
+        <div class="odoo-nav-left">
+          <button id="odoo-home-btn" class="odoo-app-switcher-btn" title="Torna alla Dashboard App (Home)">
+            <span class="grid-icon">⠿</span>
+          </button>
+          <span id="odoo-current-app-title" class="odoo-app-brand">App Dashboard</span>
+          <div id="odoo-breadcrumbs" class="odoo-breadcrumbs"></div>
+        </div>
+
+        <div class="odoo-nav-right">
+          <button id="odoo-cmd-palette-btn" class="odoo-search-trigger" title="Apri Command Palette (Alt+K)">
+            <span>🔍 Command Palette</span>
+            <kbd>Alt+K</kbd>
+          </button>
+          <div class="odoo-systray-item" id="systray-activities" title="Attività Pianificate">
+            🕒 <span class="systray-badge" id="activity-badge">3</span>
+          </div>
+          <div class="odoo-systray-company">
+            🪐 Nebula Corp (HQ)
+          </div>
+        </div>
+      </nav>
+
+      <!-- MAIN ODOO VIEWPORT + CHATTER SPLIT -->
+      <div class="odoo-body-split">
+        <!-- DYNAMIC VIEWPORT -->
+        <div id="odoo-viewport" class="odoo-viewport">
+          <!-- Dynamic App Content Rendered by JS -->
+        </div>
+
+        <!-- ODOO CHATTER & AUDIT LOG -->
+        <aside class="odoo-chatter" id="odoo-chatter">
+          <div class="chatter-tabs">
+            <button class="chatter-tab active" data-tab="log">💬 Chatter & Log</button>
+            <button class="chatter-tab" data-tab="ai">✨ AI Copilot 20</button>
+          </div>
+          <div class="chatter-composer">
+            <input type="text" id="chatter-input" placeholder="Scrivi una nota interna o @menziona..." />
+            <button id="chatter-send-btn">Invia</button>
+          </div>
+          <div id="chatter-feed" class="chatter-feed">
+            <!-- Populated by JS -->
+          </div>
+        </aside>
+      </div>
+    </section>
+  </main>
+
+  <!-- MODAL: COMMAND PALETTE (ALT+K) -->
+  <div id="cmd-palette-modal" class="modal-backdrop hidden">
+    <div class="cmd-palette-box">
+      <div class="cmd-input-wrapper">
+        <span class="cmd-icon">⚡</span>
+        <input type="text" id="cmd-search-input" placeholder="Digita un'app, un comando o '/' per azioni rapide Odoo 20..." autocomplete="off" />
+        <kbd>ESC</kbd>
+      </div>
+      <div id="cmd-results" class="cmd-results"></div>
+    </div>
+  </div>
+
+  <!-- MODAL: CODEX / THEORY & QUIZ -->
+  <div id="info-modal" class="modal-backdrop hidden">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 id="modal-title">Codex Odoo 20</h3>
+        <button id="modal-close-btn" class="close-btn">✕</button>
+      </div>
+      <div id="modal-body" class="modal-body"></div>
+    </div>
+  </div>
+
+  <!-- TOAST NOTIFICATION CONTAINER -->
+  <div id="toast-container" class="toast-container"></div>
+
+  <script src="game.js"></script>
+</body>
+</html>
